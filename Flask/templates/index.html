@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <title>패캠-데사스7B</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style media="screen">
+        .container {
+            margin-top: 40px;
+        }
+
+        .result {
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <form action="/predict" methods="POST">
+            <div class="form-group">
+            <label for="company">company</label>
+            <input type="text" class="form-control company" placeholder="Enter company" name="company" value="kia">
+            </div>
+
+            <div class="form-group">
+            <label for="subname">subname</label>
+            <input type="text" class="form-control subname" placeholder="Enter model" name=subname value="optima">
+            </div>
+
+            <div class="form-group">
+            <label for="year">year</label>
+            <input type="text" class="form-control year" placeholder="Enter year" name=year value = "2010">
+            </div>
+
+            <div class="form-group">
+            <label for="mile">mile</label>
+            <input type="text" class="form-control mile" placeholder="Enter mile" name=mile value = "50000">
+            </div>
+
+            <button type="submit" class="btn btn-primary prediction">Submit</button>
+        </form>
+
+        <div class="result row">
+            <div class="col-12 alert alert-success" role="alert"></div>
+        </div>
+        <div class="chart row">
+            <div id="container"></div>
+        </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+
+            $('.prediction').on('click', function(){
+                var company = $('.company').val();
+                var subname = $('.subname').val();
+                var year = $('.year').val();
+                var mile = $('.mile').val();
+                request = {
+                    company:company
+                    subname:subname
+                    year:year
+                    mile:mile
+                }
+                    $.post("/predict/", request).done(function(data){
+                                var result_data = []
+
+                                // result
+                                $(".result .alert").empty();
+                                for(var i=0; i < data.price.length; i++){
+                                    var summary = data.price[i] + " : " + (data.price[i]*100).toFixed(2);
+                                    var tag = "<p>" + summary + "%</p>";
+                                    $(".result .alert").append(tag);
+
+                                }
+                                $(".result").slideDown();
+
+                                // chart
+                                drawChart(result_data);
+
+                            })
+
+                        });
+
+                    })
+    </script>
+
+
+
+</body>
+
+</html>
