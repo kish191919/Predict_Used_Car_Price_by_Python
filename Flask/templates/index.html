@@ -76,20 +76,20 @@
                     year:year,
                     miles:miles
                 }
-                
+
                     $.post("/predict/", request).done(function(data){
                                 var result_data = []
-                                console.log(data)
+                                // console.log(data)
                                 // result
-                                $(".result .alert").empty();
-                                for(var i=0; i < data.year_price_list.length; i++){
-                                    var summary = data.year_price_list.year[i]+":"+ data.year_price_list.price[i] ;
+                                // $(".result .alert").empty();
+                                for(var i=0; i < data.model_price_list.length; i++){
+                                    var summary = data.year_price_list.model[i]+":"+ data.year_price_list.price[i] ;
                                     var tag = "<p>" + summary + "</p>";
                                     $(".result .alert").append(tag);
-                                    console.log(tag)
+
                                     result_data.push({
-                                    name:data.year_price_list.year[i],
-                                    y:data.year_price_list.price[i]
+                                    name:data.model_price_list.model[i],
+                                    y:data.model_price_list.price[i]
                                     })
 
 

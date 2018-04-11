@@ -85,14 +85,14 @@ def predict():
     price = np.exp(price_log)
     price = int(price)
 
-    same_brand = actual_car_info[actual_car_info["brand"] == brand]
-    year_price = same_brand[["year", "price"]]
+    same_model = actual_car_info[actual_car_info["model"] == model]
+    year_price = same_model[["year", "price"]]
     year_price_list = year_price.groupby("year").agg({'price':np.mean}).astype('int')
     year_price_list = year_price_list.reset_index()
-    model_price_list = same_brand.groupby("model").agg({'price':np.mean}).astype('int')
+    model_price_list = same_model.groupby("model").agg({'price':np.mean}).astype('int')
     model_price_list = model_price_list.reset_index()
 
-    result = {"status": 200, "price":price, "year_price_list": list(year_price_list), "model_price_list":list(model_price_list)}
+    result = {"status": 200, "price":price, "model_price_list":list(model_price_list)}
 
     return jsonify(result)
 
