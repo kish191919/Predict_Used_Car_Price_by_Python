@@ -12,8 +12,8 @@ app.config.update(
 # model = model.fit(X_train1, y_train1)
 def init():
     with open("./models/model.plk","rb") as f:
-        global model
-        model = pickle.load(f)
+        global ml
+        ml = pickle.load(f)
 
 # Train 데이터의 컬럼이름들 (dummy 컬럼 + 숫자 컬럼 이름)
 # columns = pd.DataFrame(columns = [X_train1.columns])
@@ -28,9 +28,15 @@ def target_list():
         global target_list
         target_list = pickle.load(t)
 
+def actual_car_info():
+    with open("./models/actual_car_info.plk","rb") as t:
+        global actual_car_info
+        actual_car_info = pickle.load(t)
+
 init()
 columns()
 target_list()
+actual_car_info()
 
 @app.route("/")
 def index():
@@ -43,51 +49,50 @@ def predict():
 
     target = pd.DataFrame(columns = columns)
 
-    company = request.values.get("company")
-    subname = request.values.get("subname")
+    brand = request.values.get("brand")
+    model = request.values.get("model")
     year = request.values.get("year")
-    mile = request.values.get("mile")
-    # company = request.args.get("company")
-    # subname = request.args.get("subname")
-    # year = request.args.get("year")
-    # mile = request.args.get("mile")
+    miles = request.values.get("miles")
 
-    # company = request.form["company"]
-    # subname = request.form["subname"]
-    # year =  request.form["year"]
-    # mile = request.form["mile"]
-
-    company = str(company)
-    subname = str(subname)
+    brand = str(brand)
+    model = str(model)
     year = int(year)
-    mile = int(mile)
+    miles = int(miles)
 
     cdx = 0
     for col in columns:
-        if col == 'company'+"_"+company:
+        if col == 'brand'+"_"+brand:
             break;
         cdx += 1
 
     sdx = 0
     for col in columns:
-        if col == 'subname'+"_"+subname:
+        if col == 'model'+"_"+model:
             break;
         sdx += 1
 
     target_list[cdx] = 1
     target_list[sdx] = 1
     target_list[0] = year
-    target_list[1] = mile
+    target_list[1] = miles
 
     for i in range(1):
         target.loc[i] = target_list
 
-    numerical_features = ['year', 'mile']
+    numerical_features = ['year', 'miles']
     target[numerical_features] = np.log1p(target[numerical_features])
-    price_log = model.predict(target)
+    price_log = ml.predict(target)
     price = np.exp(price_log)
     price = int(price)
-    result = {"status": 200, "result":price}
+
+    same_brand = actual_car_info[actual_car_info["brand"] == brand]
+    year_price = same_brand[["year", "price"]]
+    year_price_list = year_price.groupby("year").agg({'price':np.mean}).astype('int')
+    year_price_list = year_price_list.reset_index()
+    model_price_list = same_brand.groupby("model").agg({'price':np.mean}).astype('int')
+    model_price_list = model_price_list.reset_index()
+
+    result = {"status": 200, "price":price, "year_price_list": list(year_price_list), "model_price_list":list(model_price_list)}
 
     return jsonify(result)
 
