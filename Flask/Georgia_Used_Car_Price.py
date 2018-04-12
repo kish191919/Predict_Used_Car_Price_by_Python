@@ -43,10 +43,10 @@ def index():
     return render_template("index.html")
 
 
-# API
-@app.route("/predict/")
-def predict():
 
+# API
+@app.route("/predict/" , methods=["POST"])
+def predict():
     target = pd.DataFrame(columns = columns)
 
     brand = request.values.get("brand")
@@ -89,9 +89,14 @@ def predict():
     year_price = same_model[["year", "price"]]
     year_price_list = year_price.groupby("year").agg({'price':np.mean}).astype('int')
     year_price_list = year_price_list.reset_index()
+    year_price_list["year"] = year_price_list["year"].apply(lambda x: str(x) )
+    year_price_list["price"] = year_price_list["price"].apply(lambda x: str(x) )
+    year_list = year_price_list["year"]
+    price_list = year_price_list["price"]
 
-    result = {"status": 200, "price":price, "year_price_list":list(year_price_list)}
 
+    result = {"status": 200, "price":price, "year_list": list(year_list), "price_list":list(price_list)}
+    print(result)
     return jsonify(result)
 
 if __name__ == "__main__":
