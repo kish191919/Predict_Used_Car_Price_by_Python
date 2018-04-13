@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>패캠-데사스7B</title>
+    <title>Predict Used Car Price</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <style media="screen">
         .container {
@@ -12,7 +12,7 @@
 
         .result {
             margin-top: 10px;
-            /* display: none; */
+
         }
     </style>
 </head>
@@ -22,31 +22,37 @@
 <div class="container">
     <div class="input row">
         <div class="row">
-            <div class="form-group col-3">
-                <label for="brand">brand</label>
+            <div class="form-group col-2">
+                <label for="brand">Brand</label>
                 <input type="text" class="form-control brand" placeholder="Enter brand" name="brand" value="kia">
             </div>
 
-            <div class="form-group col-3">
-                <label for="model">model</label>
+            <div class="form-group col-2">
+                <label for="model">Model</label>
                 <input type="text" class="form-control model" placeholder="Enter model" name=model value="optima">
             </div>
 
-            <div class="form-group col-3">
-                <label for="year">year</label>
+            <div class="form-group col-2">
+                <label for="year">Year</label>
                 <input type="text" class="form-control year" placeholder="Enter year" name=year value="2010">
             </div>
 
-            <div class="form-group col-3">
-                <label for="miles">miles</label>
+            <div class="form-group col-2">
+                <label for="miles">Miles</label>
                 <input type="text" class="form-control miles" placeholder="Enter miles" name=miles value="50000">
             </div>
+            <hr class="mb-4">
+            <button class="form-group col-2 btn btn-primary btn-sm predict">Submit</button>
+                </div>
 
-        </div>
-        <button class="btn btn-primary predict">Submit</button>
     </div>
     <div class="result row">
-        <div class="col-12 alert alert-primary price_result" role="alert"></div>
+        <h4> Extimated Price : </h4>
+        <div class="col-1">
+
+        </div>
+        <div class="col-4 alert alert-primary price_result" role="alert">  </div>
+
     </div>
     <div class="chart row">
         <div id="container"></div>
@@ -80,22 +86,25 @@
                 $.post("/predict/", request).done(function(data) {
                     // console.log(data)
                     var result_data = []
+                    var same_brand = data.same_brand
+                    console.log(same_brand)
 
                     $(".result .alert").empty();
                     for (var i = 0; i < data.year_list.length; i++) {
                         // console.log(data.year_list[i]);
                         var summary = data.year_list[i] + ":" + data.price_list[i];
                         var tag = "<p>" + summary + "</p>";
-                        $(".result .alert").append(tag);
+                        // console.log(data.price)
+                        // $(".result .alert").append(data.price);
 
                         result_data.push({
                             name: data.year_list[i],
-                            y: data.price_list[i]
+                            y: Number(data.price_list[i])
                         })
 
                     }
 
-
+                    $(".result .alert").append(data.price);
                     $(".result").slideDown("slow");
 
                     // chart
@@ -108,303 +117,57 @@
 
 function drawChart(result_data){
     Highcharts.chart('container', {
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: 'Browser market shares. January, 2018'
-        },
-        subtitle: {
-            text: 'Click the columns to view versions. Source: <a href="http://statcounter.com" target="_blank">statcounter.com</a>'
-        },
-        xAxis: {
-            type: 'category'
-        },
-        yAxis: {
-            title: {
-                text: 'Total percent market share'
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Average model price per Year'
+    },
+    // subtitle: {
+    //     text: 'Source: <a href="http://en.wikipedia.org/wiki/List_of_cities_proper_by_population">Wikipedia</a>'
+    // },
+    xAxis: {
+        type: 'category',
+        labels: {
+            rotation: -45,
+            style: {
+                fontSize: '13px',
+                fontFamily: 'Verdana, sans-serif'
             }
-
-        },
-        legend: {
-            enabled: false
-        },
-        plotOptions: {
-            series: {
-                borderWidth: 0,
-                dataLabels: {
-                    enabled: true,
-                    format: '{point.y:.1f}%'
-                }
-            }
-        },
-
-        tooltip: {
-            headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-            pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
-        },
-
-        "series": [{
-            "name": "Browsers",
-            "colorByPoint": true,
-            "data": [{
-                    "name": "Chrome",
-                    "y": 62.74,
-                    "drilldown": "Chrome"
-                },
-                {
-                    "name": "Firefox",
-                    "y": 10.57,
-                    "drilldown": "Firefox"
-                },
-                {
-                    "name": "Internet Explorer",
-                    "y": 7.23,
-                    "drilldown": "Internet Explorer"
-                },
-                {
-                    "name": "Safari",
-                    "y": 5.58,
-                    "drilldown": "Safari"
-                },
-                {
-                    "name": "Edge",
-                    "y": 4.02,
-                    "drilldown": "Edge"
-                },
-                {
-                    "name": "Opera",
-                    "y": 1.92,
-                    "drilldown": "Opera"
-                },
-                {
-                    "name": "Other",
-                    "y": 7.62,
-                    "drilldown": null
-                }
-            ]
-        }],
-        "drilldown": {
-            "series": [{
-                    "name": "Chrome",
-                    "id": "Chrome",
-                    "data": [
-                        [
-                            "v65.0",
-                            0.1
-                        ],
-                        [
-                            "v64.0",
-                            1.3
-                        ],
-                        [
-                            "v63.0",
-                            53.02
-                        ],
-                        [
-                            "v62.0",
-                            1.4
-                        ],
-                        [
-                            "v61.0",
-                            0.88
-                        ],
-                        [
-                            "v60.0",
-                            0.56
-                        ],
-                        [
-                            "v59.0",
-                            0.45
-                        ],
-                        [
-                            "v58.0",
-                            0.49
-                        ],
-                        [
-                            "v57.0",
-                            0.32
-                        ],
-                        [
-                            "v56.0",
-                            0.29
-                        ],
-                        [
-                            "v55.0",
-                            0.79
-                        ],
-                        [
-                            "v54.0",
-                            0.18
-                        ],
-                        [
-                            "v51.0",
-                            0.13
-                        ],
-                        [
-                            "v49.0",
-                            2.16
-                        ],
-                        [
-                            "v48.0",
-                            0.13
-                        ],
-                        [
-                            "v47.0",
-                            0.11
-                        ],
-                        [
-                            "v43.0",
-                            0.17
-                        ],
-                        [
-                            "v29.0",
-                            0.26
-                        ]
-                    ]
-                },
-                {
-                    "name": "Firefox",
-                    "id": "Firefox",
-                    "data": [
-                        [
-                            "v58.0",
-                            1.02
-                        ],
-                        [
-                            "v57.0",
-                            7.36
-                        ],
-                        [
-                            "v56.0",
-                            0.35
-                        ],
-                        [
-                            "v55.0",
-                            0.11
-                        ],
-                        [
-                            "v54.0",
-                            0.1
-                        ],
-                        [
-                            "v52.0",
-                            0.95
-                        ],
-                        [
-                            "v51.0",
-                            0.15
-                        ],
-                        [
-                            "v50.0",
-                            0.1
-                        ],
-                        [
-                            "v48.0",
-                            0.31
-                        ],
-                        [
-                            "v47.0",
-                            0.12
-                        ]
-                    ]
-                },
-                {
-                    "name": "Internet Explorer",
-                    "id": "Internet Explorer",
-                    "data": [
-                        [
-                            "v11.0",
-                            6.2
-                        ],
-                        [
-                            "v10.0",
-                            0.29
-                        ],
-                        [
-                            "v9.0",
-                            0.27
-                        ],
-                        [
-                            "v8.0",
-                            0.47
-                        ]
-                    ]
-                },
-                {
-                    "name": "Safari",
-                    "id": "Safari",
-                    "data": [
-                        [
-                            "v11.0",
-                            3.39
-                        ],
-                        [
-                            "v10.1",
-                            0.96
-                        ],
-                        [
-                            "v10.0",
-                            0.36
-                        ],
-                        [
-                            "v9.1",
-                            0.54
-                        ],
-                        [
-                            "v9.0",
-                            0.13
-                        ],
-                        [
-                            "v5.1",
-                            0.2
-                        ]
-                    ]
-                },
-                {
-                    "name": "Edge",
-                    "id": "Edge",
-                    "data": [
-                        [
-                            "v16",
-                            2.6
-                        ],
-                        [
-                            "v15",
-                            0.92
-                        ],
-                        [
-                            "v14",
-                            0.4
-                        ],
-                        [
-                            "v13",
-                            0.1
-                        ]
-                    ]
-                },
-                {
-                    "name": "Opera",
-                    "id": "Opera",
-                    "data": [
-                        [
-                            "v50.0",
-                            0.96
-                        ],
-                        [
-                            "v49.0",
-                            0.82
-                        ],
-                        [
-                            "v12.1",
-                            0.14
-                        ]
-                    ]
-                }
-            ]
         }
-    });
-}
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Averge car price'
+        }
+    },
+    legend: {
+        enabled: false
+    },
+    tooltip: {
+        pointFormat: 'Average car price: <b>{point.y:.1f} dallor</b>'
+    },
+    series: [{
+        name: 'price',
+        data: result_data,
+        dataLabels: {
+            enabled: true,
+            rotation: -90,
+            color: '#FFFFFF',
+            align: 'right',
+            format: '{point.y:.1f}', // one decimal
+            y: 10, // 10 pixels down from the top
+            style: {
+                fontSize: '13px',
+                fontFamily: 'Verdana, sans-serif'
+                            }
+                        }
+                    }]
+                });
+                }
+
+
 
 
     </script>

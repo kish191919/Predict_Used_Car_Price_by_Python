@@ -29,14 +29,23 @@ def target_list():
         target_list = pickle.load(t)
 
 def actual_car_info():
-    with open("./models/actual_car_info.plk","rb") as t:
+    with open("./models/actual_car_info.plk","rb") as a:
         global actual_car_info
-        actual_car_info = pickle.load(t)
+        actual_car_info = pickle.load(a)
+
+def database():
+    with open("./models/database.plk","rb") as d:
+        global database
+        database = pickle.load(d)
 
 init()
 columns()
 target_list()
 actual_car_info()
+database()
+
+brand_group = list(set(database["brand"]))
+model_group = list(set(database["model"]))
 
 @app.route("/")
 def index():
@@ -54,8 +63,8 @@ def predict():
     year = request.values.get("year")
     miles = request.values.get("miles")
 
-    brand = str(brand)
-    model = str(model)
+    brand = str(brand).lower()
+    model = str(model).lower()
     year = int(year)
     miles = int(miles)
 
@@ -93,9 +102,12 @@ def predict():
     year_price_list["price"] = year_price_list["price"].apply(lambda x: str(x) )
     year_list = year_price_list["year"]
     price_list = year_price_list["price"]
+    same_brand = actual_car_info[actual_car_info["brand"]==brand]
+    same_brand = list(set(same_brand["model"]))
+    same_brand.sort()
 
 
-    result = {"status": 200, "price":price, "year_list": list(year_list), "price_list":list(price_list)}
+    result = {"status": 200, "price":price, "year_list": list(year_list), "price_list":list(price_list), "same_brand":same_brand}
     print(result)
     return jsonify(result)
 
