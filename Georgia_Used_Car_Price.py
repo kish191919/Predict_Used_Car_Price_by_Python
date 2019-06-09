@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+#from flask import flask, render_template, request, jsonify
+from flask import *
 import pickle
 import numpy as np
 import pandas as pd
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
 app = Flask(__name__)
