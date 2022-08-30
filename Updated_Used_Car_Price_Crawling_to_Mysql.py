@@ -16,10 +16,10 @@ def main():
     # Create a data frame to store crawling data
     global df
     df = pd.DataFrame(
-        columns=['listing_id', 'title', 'year', 'brand', 'model', 'deal', 'price', 'mileage', 'carfax', 'dealer'])
+        columns=['listing_id', 'title', 'year', 'brand', 'model', 'deal', 'price', 'miles', 'carfax', 'dealer'])
 
     # Getting data from Cars.com
-    page = 1
+    page = 50
     loop_url(page)
     exclude_non_value(df)
 
@@ -27,7 +27,7 @@ def main():
 def loop_url(page):
     for page in range(1, int(page) + 1):
         url = 'https://www.cars.com/shopping/results/?page=' + str(
-            page) + '&page_size=100&list_price_max=&makes[]=&maximum_distance=20&models[]=&stock_type=all&zip=35242'
+            page) + '&page_size=100&list_price_max=&makes[]=&maximum_distance=all&models[]=&stock_type=used&zip=22031'
         response = requests.get(url)
         scrape_news_list_page(response)
 
@@ -44,7 +44,7 @@ def scrape_news_list_page(response):
 
         deal = extract_deal(info)
         price = extract_price(info)
-        mileage = extract_mileage(info)
+        miles = extract_mileage(info)
         carfax = extract_carfax(info)
         dealer = extract_dealer(info)
 
@@ -57,7 +57,7 @@ def scrape_news_list_page(response):
             'model': model.upper(),
             'deal': deal.upper(),
             'price': int(price),
-            'mileage': int(mileage),
+            'miles': int(miles),
             'carfax': carfax.upper(),
             'dealer': dealer.upper()
         }
@@ -92,7 +92,7 @@ def exclude_non_value(df):
     df = df[df["brand"] != ""]
     df = df[df["model"] != ""]
     df = df[df["price"] != 0]
-    df = df[df["mileage"] != 0]
+    df = df[df["miles"] != 0]
     return df
 
 
@@ -108,7 +108,7 @@ def extract_brand(title):
 
 
 def extract_model(title):
-    model = title.split(" ")[2:]
+    model = title.split(" ")[2:3]
     model = " ".join(model)
     return model
 
@@ -134,13 +134,13 @@ def extract_price(info):
 
 def extract_mileage(info):
     try:
-        mileage = info.xpath('./div[@class="vehicle-details"]/div[@class="mileage"]')
-        mileage = mileage[0].text
-        mileage = re.sub(r'[^0-9]', '', mileage)
-        return mileage
+        miles = info.xpath('./div[@class="vehicle-details"]/div[@class="mileage"]')
+        miles = miles[0].text
+        miles = re.sub(r'[^0-9]', '', miles)
+        return miles
     except:
-        mileage = 0
-        return mileage
+        miles = 0
+        return miles
 
 
 def extract_carfax(info):

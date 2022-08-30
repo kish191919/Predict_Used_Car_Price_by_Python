@@ -26,7 +26,7 @@ def main():
 def load_data():
 
     # Read Password
-    pw = pickle.load(open('./Flask//models/pw.plk', 'rb'))
+    pw = pickle.load(open('./Flask/models/pw.plk', 'rb'))
 
     # AWS MySql Connection Info
     db = pymysql.connect(
@@ -43,7 +43,7 @@ def load_data():
     """
 
     train = pd.read_sql(SQL_QUERY, db)
-    pickle.dump(train, open("./Flask//models/database.plk", "wb"))
+    pickle.dump(train, open("./Flask/models/database.plk", "wb"))
 
     return train
 
@@ -63,7 +63,7 @@ def filtered_top_50_brand_process(train):
     train.reset_index(drop=True, inplace=True)
     train = train.drop("index", axis=1)
 
-    actual_car_info = train[["brand", "model", "year", "mileage", "price"]]
+    actual_car_info = train[["brand", "model", "year", "miles", "price"]]
     pickle.dump(actual_car_info, open("./Flask/models/actual_car_info.plk", "wb"))
 
     return train
@@ -75,7 +75,7 @@ def normalized_process(train):
 
     dummy_cat = pd.get_dummies(train[categorical_features])
 
-    numerical_features = ['year', 'mileage', 'price']
+    numerical_features = ['year', 'miles', 'price']
 
     normalize_num = np.log1p(train[numerical_features])
 
@@ -107,10 +107,10 @@ def build_XGBRegressor_model(X_train1, X_test1, y_train1):
 
 def test(X_train1, ml):
 
-    brand = 'TOYOTA'
-    model = '4RUNNER LIMITED'
+    brand = 'FORD'
+    model = 'F-150'
     year = 2019
-    mileage = 40000
+    miles = 40000
 
     target = pd.DataFrame(columns=[X_train1.columns])
 
@@ -135,9 +135,9 @@ def test(X_train1, ml):
     target_list[brand_index] = 1
     target_list[model_index] = 1
 
-    # Put the year and mileage in the data frame
+    # Put the year and miles in the data frame
     target_list[0] = year
-    target_list[1] = mileage
+    target_list[1] = miles
 
     # Insert data into target data frame
     for i in range(1):
@@ -145,9 +145,9 @@ def test(X_train1, ml):
 
 
     # Nomalizing numerical features
-    numerical_features = ['year', 'mileage']
+    numerical_features = ['year', 'miles']
     normalize_target = np.log1p(target[numerical_features])
-    target.drop(['year', 'mileage'], axis=1, inplace=True)
+    target.drop(['year', 'miles'], axis=1, inplace=True)
     target_goal = normalize_target.join(target)
 
     # Predicted logged price

@@ -1,5 +1,4 @@
-#from flask import flask, render_template, request, jsonify
-from flask import *
+from flask import Flask,render_template, request, jsonify
 import pickle
 import numpy as np
 import pandas as pd
@@ -66,8 +65,8 @@ def predict():
     year = request.values.get("year")
     miles = request.values.get("miles")
 
-    brand = str(brand).lower()
-    model = str(model).lower()
+    brand = str(brand).upper()
+    model = str(model).upper()
     year = int(year)
     miles = int(miles)
 

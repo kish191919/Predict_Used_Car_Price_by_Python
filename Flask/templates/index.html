@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Predict Used Car Price</title>
+    <title>Predict Car Price</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <style media="screen">
         .container {
@@ -24,7 +24,7 @@
 </div> -->
 
 <div class="text-center  alert-success">
-  <h2 class="alert-heading">Predict Used-Car in Georgia </h2>
+  <h2 class="alert-heading">Predict Used-Car in Virginia</h2>
   Please fill in the information (Brand, Model, Year, Miles) below about the used-car you want to know about the price. <br>
   And then press the submit button.<br>
   <hr>
@@ -39,17 +39,17 @@
         <div class="row">
             <div class="form-group col-2">
                 <label for="brand">Brand</label>
-                <input type="text" class="form-control brand" placeholder="Enter brand" name="brand" value="kia">
+                <input type="text" class="form-control brand" placeholder="Enter brand" name="brand" value="FORD">
             </div>
 
             <div class="form-group col-2">
                 <label for="model">Model</label>
-                <input type="text" class="form-control model" placeholder="Enter model" name=model value="optima">
+                <input type="text" class="form-control model" placeholder="Enter model" name=model value="F-150">
             </div>
 
             <div class="form-group col-2">
                 <label for="year">Year</label>
-                <input type="text" class="form-control year" placeholder="Enter year" name=year value="2010">
+                <input type="text" class="form-control year" placeholder="Enter year" name=year value="2021">
             </div>
 
             <div class="form-group col-2">
@@ -136,7 +136,7 @@ function drawChart(result_data){
         type: 'column'
     },
     title: {
-        text: 'Average model price per Year'
+        text: 'Average Same Model Price per Year'
     },
     // subtitle: {
     //     text: 'Source: <a href="http://en.wikipedia.org/wiki/List_of_cities_proper_by_population">Wikipedia</a>'
@@ -154,7 +154,7 @@ function drawChart(result_data){
     yAxis: {
         min: 0,
         title: {
-            text: 'Averge car price'
+            text: 'Average Car Price'
         }
     },
     legend: {
