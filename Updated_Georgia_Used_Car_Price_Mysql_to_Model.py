@@ -1,5 +1,5 @@
-
-import MySQLdb, pickle
+# coding: utf-8
+import pymysql, pickle
 import pandas as pd
 from sqlalchemy import create_engine
 from collections import Counter
@@ -29,11 +29,11 @@ def load_data():
     pw = pickle.load(open('./Flask//models/pw.plk', 'rb'))
 
     # AWS MySql Connection Info
-    db = MySQLdb.connect(
-        "cars.c3d1kxjihbmh.us-east-1.rds.amazonaws.com",
-        "root",
-        pw,
-        "cars",
+    db = pymysql.connect(
+        host = "cars.c3d1kxjihbmh.us-east-1.rds.amazonaws.com",
+        user = "root",
+        password = pw,
+        db = "cars",
         charset='utf8',
     )
 
