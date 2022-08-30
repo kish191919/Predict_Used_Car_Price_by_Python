@@ -53,8 +53,6 @@ model_group = list(set(database["model"]))
 def index():
     return render_template("index.html")
 
-
-
 # API
 @app.route("/predict/" , methods=["POST"])
 def predict():

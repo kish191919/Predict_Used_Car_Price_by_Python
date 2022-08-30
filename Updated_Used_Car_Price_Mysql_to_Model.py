@@ -130,6 +130,9 @@ def test(X_train1, ml):
     # Array of zeros
     target_list = np.zeros_like(X_train1.loc[0])
 
+    # Save the target_list to pickle file
+    pickle.dump(target_list, open("./Flask/models/target_list.plk", "wb"))
+
 
     # Put the number 1 in the selected brand and model locations in the data frame
     target_list[brand_index] = 1

@@ -1,4 +1,4 @@
-# Predict Used Car Price in Georgia 
+# Predict Used Car Price  
 ### (Sevice WebSite: http://3.133.82.223/ )
 
 ## Subject : Machine learning based used car prices forecasting web service
