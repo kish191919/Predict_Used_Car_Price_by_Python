@@ -15,6 +15,7 @@ def main():
     loop_url(page)
 
 
+# Extract Year 
 def extract_year(info):
     pattern = r'"model_year":"(.*?)"'
     matches = re.search(pattern, str(info))
@@ -26,6 +27,7 @@ def extract_year(info):
         return 'N/A'
 
 
+# Extract Brand 
 def extract_brand(info):
     pattern = r'"make":"(.*?)"'
     matches = re.search(pattern, str(info))
