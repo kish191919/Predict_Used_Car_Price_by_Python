@@ -2,14 +2,13 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import re
-import json
 
 def main():
     global df
 
     # Create an empty DataFrame to store the data
     df = pd.DataFrame(columns=['Year', 'Brand', 'Model', 'Mileage','Bodystyle','Dealer','Exterior Color','Interior Color',\
-                               'Drivetrain','MPG', 'Fuel Type','Transmission', 'Engine',  'Price'])
+                            'Drivetrain','MPG', 'Fuel Type','Transmission', 'Engine',  'Price'])
     
     # Getting data from Cars.com
     page = 1
