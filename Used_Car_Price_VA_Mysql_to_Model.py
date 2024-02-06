@@ -22,10 +22,11 @@ def load_data():
 
     # Read Password
     pw = pickle.load(open('pw.pkl', 'rb'))
+    host_ = pickle.load(open('host.pkl', 'rb')) 
     
     # AWS MySql Connection Info
     db = pymysql.connect(
-        host = "ec2-54-160-218-232.compute-1.amazonaws.com",
+        host = host_,
         user = "root",
         password = pw,
         db = "usedcar",
@@ -107,10 +108,10 @@ def build_XGBRegressor_model(X_train1, X_test1, y_train1):
 
 def test(X_train1, ml):
 
-    brand = 'ford'
-    model = 'f-150'
-    year = 2022
-    mileage = 40000
+    brand = 'honda'
+    model = 'accord'
+    year = 2010
+    mileage = 150000
 
     target = pd.DataFrame(columns=[X_train1.columns])
 

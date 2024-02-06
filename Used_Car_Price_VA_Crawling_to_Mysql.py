@@ -17,7 +17,7 @@ def main():
     # Getting data from Cars.com
     page = 1
     # zips = [22030, 20155, 23223, 23805, 24501, 24015, 24401, 22630]
-    ips = [22030, 20155]
+    zips = [22030, 20155]
     loop_url(page, zips)
 
 
@@ -228,7 +228,7 @@ def load_database(df):
         host = pickle.load(f)
     
 
-    engine = create_engine("mysql+mysqlconnector://root:" + pw + "@" + host + "/usedcar", pool_pre_ping=True, max_allowed_packet = 128M)
+    engine = create_engine("mysql+mysqlconnector://root:" + pw + "@" + host + "/usedcar", pool_pre_ping=True)
     df.to_sql(name="usedcar", con=engine, if_exists='append')
     
     
