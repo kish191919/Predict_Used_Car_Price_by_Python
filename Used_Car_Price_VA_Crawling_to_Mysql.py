@@ -2,21 +2,23 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import re
+import pickle
 
 import mysql.connector
 from sqlalchemy import create_engine
-
 
 def main():
     global df
 
     # Create an empty DataFrame to store the data
-    df = pd.DataFrame(columns=['Year', 'Brand', 'Model', 'Mileage','Bodystyle','Dealer','Exterior Color','Interior Color',\
+    df = pd.DataFrame(columns=['ID','Year', 'Brand', 'Model', 'Mileage','Bodystyle','Dealer','Exterior Color','Interior Color',\
                             'Drivetrain','MPG', 'Fuel Type','Transmission', 'Engine',  'Price'])
     
     # Getting data from Cars.com
     page = 1
-    loop_url(page)
+    # zips = [22030, 20155, 23223, 23805, 24501, 24015, 24401, 22630]
+    ips = [22030, 20155]
+    loop_url(page, zips)
 
 
 # Extract Year 
@@ -96,11 +98,13 @@ def extract_details(info):
     fuel_type = None
     transmission = None
     engine = None
+    detailed_link = None
     
     all_links = info.find_all('a', href=True)
-    filtered_links = [link['href'] for link in all_links if "vehicledetail" in link['href']][0]
+    detailed_links = [link['href'] for link in all_links if "vehicledetail" in link['href']][0]
     
-    link = 'https://www.cars.com' + str(filtered_links)
+    
+    link = 'https://www.cars.com' + str(detailed_links)
     response = requests.get(link)
         
     # parse the response.
@@ -143,7 +147,6 @@ def extract_details(info):
             if dt_elements and dt_elements[6].text.strip() == 'Engine':
                 engine = dd_elements[6].text.strip()
                 engine = engine.lower() if engine is not None and engine != "-" else None
-
         
         except:
             pass
@@ -151,21 +154,25 @@ def extract_details(info):
     return exterior_color, interior_color, drivetrain, mpg, fuel_type, transmission, engine
 
 
-def loop_url(pages):
-    for page in range(1, int(pages)+1):     
-        url = 'https://www.cars.com/shopping/results/?dealer_id=&keyword=&list_price_max\
-        =&list_price_min=&makes[]=&maximum_distance=500&mileage_max=&monthly_payment=&page='+str(page)+\
-        '&page_size=20&sort=best_match_desc&stock_type=used&year_max=&year_min=&zip=22030'
-
-        # Send a request to a webpage and receive a response.
-        response = requests.get(url)
+def loop_url(pages, zips):
+    try:
+        for zip in zips:
+            for page in range(1, int(pages)+1):     
+                url = 'https://www.cars.com/shopping/results/?dealer_id=&keyword=&list_price_max\
+                =&list_price_min=&makes[]=&maximum_distance=500&mileage_max=&monthly_payment=&page='+str(page)+\
+                '&page_size=20&sort=best_match_desc&stock_type=used&year_max=&year_min=&zip='+str(zip)
         
-        # parse the response.
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Find the HTML element that contains the car information.
-        car_elements = soup.find_all('div', class_='vehicle-card')
-        scrape_car_info(car_elements)
+                # Send a request to a webpage and receive a response.
+                response = requests.get(url)
+                
+                # parse the response.
+                soup = BeautifulSoup(response.content, 'html.parser')
+                
+                # Find the HTML element that contains the car information.
+                car_elements = soup.find_all('div', class_='vehicle-card')
+                scrape_car_info(car_elements)
+    except:
+        pass
     
     
 def scrape_car_info(car_elements):
@@ -182,10 +189,13 @@ def scrape_car_info(car_elements):
             bodystyle = extract_bodystyle(info)
             dealer = extract_dealer(info)
             exterior_color, interior_color, drivetrain, mpg, fuel_type, transmission, engine = extract_details(info)
+            id = str(year)+brand+model+str(mileage)+dealer
+            id = id.replace(" ","")
             
             
             # Create a DataFrame to store the data you want to append
             data_to_append = pd.DataFrame({
+                'ID': [id],
                 'Year': [year],
                 'Brand': [brand],
                 'Model': [model],
@@ -211,10 +221,15 @@ def scrape_car_info(car_elements):
         return None
 
 def load_database(df):
-    pw = '6868'
+    with open('pw.pkl', 'rb') as f:
+        pw = pickle.load(f)
+        
+    with open('host.pkl', 'rb') as f:
+        host = pickle.load(f)
+    
 
-    engine = create_engine("mysql+mysqlconnector://root:" + pw + "@ec2-54-210-208-150.compute-1.amazonaws.com/usedcar", pool_pre_ping=True)
-    df.to_sql(name="usedcar", con=engine, if_exists='replace')
+    engine = create_engine("mysql+mysqlconnector://root:" + pw + "@" + host + "/usedcar", pool_pre_ping=True, max_allowed_packet = 128M)
+    df.to_sql(name="usedcar", con=engine, if_exists='append')
     
     
 
