@@ -3,6 +3,10 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
+import mysql.connector
+from sqlalchemy import create_engine
+
+
 def main():
     global df
 
@@ -22,9 +26,9 @@ def extract_year(info):
 
     if matches:
         year = matches.group(1)
-        return year
+        return int(year)
     else:
-        return 'N/A'
+        return None
 
 
 # Extract Brand 
@@ -34,9 +38,9 @@ def extract_brand(info):
 
     if matches:
         brand = matches.group(1)
-        return brand
+        return brand.lower()
     else:
-        return 'N/A'
+        return None
 
 
 def extract_model(info):
@@ -46,9 +50,9 @@ def extract_model(info):
 
     if matches:
         model = matches.group(1)
-        return model
+        return model.lower()
     else:
-        return 'N/A'
+        return None
 
         
 def extract_bodystyle(info):
@@ -57,41 +61,41 @@ def extract_bodystyle(info):
 
     if matches:
         bodystyle = matches.group(1)
-        return bodystyle
+        return bodystyle.lower()
     else:
-        return 'N/A'
+        return None
 
 
 def extract_price(info):
     price_info = info.find('span', class_='primary-price')
-    price = price_info.text.strip() if price_info else 'N/A'
+    price = price_info.text.strip() if price_info else None
     price = re.findall(r'\d+', price)
     price = ''.join(price)
-    return price
+    return int(price)
 
 
 def extract_mileage(info):
     mileage_info = info.find('div', class_='mileage')
-    mileage = mileage_info.text.strip() if mileage_info else 'N/A'
+    mileage = mileage_info.text.strip() if mileage_info else None
     mileage = re.findall(r'\d+', mileage)
     mileage = ''.join(mileage)
-    return mileage
+    return int(mileage)
 
 
 def extract_dealer(info):
     dealer_info = info.find(class_='dealer-name')
-    dealer = dealer_info.text.strip() if dealer_info else 'N/A'
-    return dealer
+    dealer = dealer_info.text.strip() if dealer_info else None
+    return dealer.lower()
 
 
 def extract_details(info):
-    exterior_color = 'N/A'
-    interior_color = 'N/A'
-    drivetrain = 'N/A'
-    mpg = 'N/A'
-    fuel_type = 'N/A'
-    transmission = 'N/A'
-    engine = 'N/A'
+    exterior_color = None
+    interior_color = None
+    drivetrain = None
+    mpg = None
+    fuel_type = None
+    transmission = None
+    engine = None
     
     all_links = info.find_all('a', href=True)
     filtered_links = [link['href'] for link in all_links if "vehicledetail" in link['href']][0]
@@ -113,24 +117,34 @@ def extract_details(info):
             
             if dt_elements and dt_elements[0].text.strip() == 'Exterior color':
                 exterior_color = dd_elements[0].text.strip()
+                exterior_color = exterior_color.lower() if exterior_color is not None and exterior_color != "-" else None
+                
     
             if dt_elements and dt_elements[1].text.strip() == 'Interior color':
                 interior_color = dd_elements[1].text.strip()
+                interior_color = interior_color.lower() if interior_color is not None and interior_color != "-" else None
     
             if dt_elements and dt_elements[2].text.strip() == 'Drivetrain':
                 drivetrain = dd_elements[2].text.strip().split()[0]
+                drivetrain = drivetrain.lower() if drivetrain is not None and drivetrain != "-" else None
     
             if dt_elements and dt_elements[3].text.strip() == 'MPG':
-                mpg = dd_elements[3].text.strip()
+                mpg = dd_elements[3].text.strip().split()[0]
+                mpg = mpg if mpg is not None and mpg != "-" else None
     
             if dt_elements and dt_elements[4].text.strip() == 'Fuel type':
                 fuel_type = dd_elements[4].text.strip()
+                fuel_type = fuel_type.lower() if fuel_type is not None and fuel_type != "-" else None
     
             if dt_elements and dt_elements[5].text.strip() == 'Transmission':
                 transmission = dd_elements[5].text.strip()
+                transmission = transmission.lower() if transmission is not None and transmission != "-" else None
     
             if dt_elements and dt_elements[6].text.strip() == 'Engine':
                 engine = dd_elements[6].text.strip()
+                engine = engine.lower() if engine is not None and engine != "-" else None
+
+        
         except:
             pass
 
@@ -195,8 +209,16 @@ def scrape_car_info(car_elements):
     except Exception as e:
         print(f"Error: {e}")
         return None
-        
+
+def load_database(df):
+    pw = '6868'
+
+    engine = create_engine("mysql+mysqlconnector://root:" + pw + "@ec2-54-210-208-150.compute-1.amazonaws.com/usedcar", pool_pre_ping=True)
+    df.to_sql(name="usedcar", con=engine, if_exists='replace')
+    
+    
 
 if __name__ == "__main__":
     main()
-    print(df)
+    #print(df)
+    load_database(df)
