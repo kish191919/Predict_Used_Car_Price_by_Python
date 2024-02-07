@@ -154,6 +154,19 @@ def extract_details(info):
     return exterior_color, interior_color, drivetrain, mpg, fuel_type, transmission, engine
 
 
+def load_database(df):
+    with open('pw.pkl', 'rb') as f:
+        pw = pickle.load(f)
+        
+    with open('host.pkl', 'rb') as f:
+        host = pickle.load(f)
+    
+
+    engine = create_engine("mysql+mysqlconnector://root:" + pw + "@" + host + "/usedcar", pool_pre_ping=True)
+    df.to_sql(name="usedcar", con=engine, if_exists='append', index=False)
+    df = None
+
+
 def loop_url(pages, zips):
     try:
         for zip in zips:
@@ -171,6 +184,9 @@ def loop_url(pages, zips):
                 # Find the HTML element that contains the car information.
                 car_elements = soup.find_all('div', class_='vehicle-card')
                 scrape_car_info(car_elements)
+                
+            load_database(df)
+            
     except:
         pass
     
@@ -219,21 +235,8 @@ def scrape_car_info(car_elements):
     except Exception as e:
         print(f"Error: {e}")
         return None
-
-def load_database(df):
-    with open('pw.pkl', 'rb') as f:
-        pw = pickle.load(f)
-        
-    with open('host.pkl', 'rb') as f:
-        host = pickle.load(f)
-    
-
-    engine = create_engine("mysql+mysqlconnector://root:" + pw + "@" + host + "/usedcar", pool_pre_ping=True)
-    df.to_sql(name="usedcar", con=engine, if_exists='append')
-    
     
 
 if __name__ == "__main__":
     main()
     #print(df)
-    load_database(df)
