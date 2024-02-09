@@ -15,9 +15,9 @@ def main():
                             'Drivetrain','MPG', 'Fuel Type','Transmission', 'Engine',  'Price'])
     
     # Getting data from Cars.com
-    page = 1
+    page = 50
     # zips = [22030, 20155, 23223, 23805, 24501, 24015, 24401, 22630]
-    zips = [22030, 20155]
+    zips = [22193, 23464, 20147, 23322, 22407, 22554, 23112, 23666]
     loop_url(page, zips)
 
 
@@ -155,10 +155,10 @@ def extract_details(info):
 
 
 def load_database(df):
-    with open('pw.pkl', 'rb') as f:
+    with open('./Flask/pickle/pw.pkl', 'rb') as f:
         pw = pickle.load(f)
         
-    with open('host.pkl', 'rb') as f:
+    with open('./Flask/pickle/host.pkl', 'rb') as f:
         host = pickle.load(f)
     
 
@@ -170,6 +170,7 @@ def load_database(df):
 def loop_url(pages, zips):
     try:
         for zip in zips:
+            print(f"Start to collect the data from {zip} area")
             for page in range(1, int(pages)+1):     
                 url = 'https://www.cars.com/shopping/results/?dealer_id=&keyword=&list_price_max\
                 =&list_price_min=&makes[]=&maximum_distance=500&mileage_max=&monthly_payment=&page='+str(page)+\
@@ -186,6 +187,7 @@ def loop_url(pages, zips):
                 scrape_car_info(car_elements)
                 
             load_database(df)
+            print(f"Upload the data from {zip} to MySQL")
             
     except:
         pass
@@ -239,4 +241,4 @@ def scrape_car_info(car_elements):
 
 if __name__ == "__main__":
     main()
-    #print(df)
+    print("Done")

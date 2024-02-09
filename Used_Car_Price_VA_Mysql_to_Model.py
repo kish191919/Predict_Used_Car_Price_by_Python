@@ -27,8 +27,8 @@ def main():
 def load_data():
 
     # Read Password
-    pw = pickle.load(open('pw.pkl', 'rb'))
-    host_ = pickle.load(open('host.pkl', 'rb')) 
+    pw = pickle.load(open('./Flask/pickle/pw.pkl', 'rb'))
+    host_ = pickle.load(open('./Flask/pickle/host.pkl', 'rb')) 
     
     # AWS MySql Connection Info
     db = pymysql.connect(
@@ -45,7 +45,7 @@ def load_data():
     """
 
     train = pd.read_sql(SQL_QUERY, db)
-    pickle.dump(train, open("train.pkl", "wb"))
+    pickle.dump(train, open("./Flask/pickle/database.pkl", "wb"))
     
     return train
 
@@ -79,7 +79,7 @@ def filtered_top_40_brand_process(train):
     train = train.drop("index", axis=1)
 
     actual_car_info = train[["Brand", "Model", "Year", "Mileage", "Price"]]
-    pickle.dump(actual_car_info, open("actual_car_info.pkl", "wb"))
+    pickle.dump(actual_car_info, open("./Flask/pickle/actual_car_info.pkl", "wb"))
 
     return train
 
@@ -122,7 +122,8 @@ def build_XGBRegressor_model(X_train1, y_train1):
     
     # Train model
     ml = ml.fit(X_train1, y_train1, verbose=False)
-    pickle.dump(ml, open("model.pkl", "wb"))
+    pickle.dump(ml, open("./Flask/pickle/model.pkl", "wb"))
+    pickle.dump(X_train1.columns, open("./Flask/pickle/column.pkl", "wb"))
 
     return ml
 
@@ -153,7 +154,7 @@ def test(X_train1, ml):
     target_list = np.zeros_like(X_train1.iloc[0])
 
     # Save the target_list to pickle file
-    pickle.dump(target_list, open("target_list.pkl", "wb"))
+    pickle.dump(target_list, open("./Flask/pickle/target_list.pkl", "wb"))
 
     # Put the number 1 in the selected brand and model locations in the data frame
     target_list[brand_index] = 1
