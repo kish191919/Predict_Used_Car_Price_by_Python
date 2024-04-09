@@ -14,10 +14,10 @@ def main():
     df = pd.DataFrame(columns=['ID','Year', 'Brand', 'Model', 'Mileage','Bodystyle','Dealer','Exterior Color','Interior Color',\
                             'Drivetrain','MPG', 'Fuel Type','Transmission', 'Engine',  'Price'])
     
-    # Getting data from Cars.com
+    # Getting data from Cars.com by using Virginia zip codes
     page = 50
-    # zips = [22030, 20155, 23223, 23805, 24501, 24015, 24401, 22630]
-    zips = [22193, 23464, 20147, 23322, 22407, 22554, 23112, 23666]
+    zips = [20147, 20155, 22030, 22193, 22407, 22554, 22630, 23112, 23223, 23322,\
+            23464, 23666, 23805, 24015, 24401, 24501]
     loop_url(page, zips)
 
 
