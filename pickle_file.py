@@ -11,7 +11,7 @@ with open('./Flask/pickle/pw.pkl', 'rb') as f:
     data = pickle.load(f)
 
 
-host_file = 'ec2-34-224-88-191.compute-1.amazonaws.com'
+host_file = 'ec2-3-87-146-248.compute-1.amazonaws.com'
 # 파일로 저장
 with open('./Flask/pickle/host.pkl', 'wb') as f:
     pickle.dump(host_file, f)
